@@ -23,4 +23,5 @@ EOF
 
 RUN chmod +x /start.sh
 
-CMD bash /start.sh
+CMD python3 -m http.server 8080 & \
+    bash /start.sh
