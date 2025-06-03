@@ -28,28 +28,9 @@ RUN cat <<EOF > /start.sh
 # Start PufferPanel service
 echo "Starting PufferPanel service..."
 systemctl enable --now pufferpanel
-
-# Check if this is first time startup
-FIRST_START_FLAG="/var/lib/pufferpanel/.first_start"
-if [ ! -f "$FIRST_START_FLAG" ]; then
-    echo "First time startup detected - creating admin user..."
-    
-    # Check if all required environment variables are set
-
-    # Create admin user
-    pufferpanel user add --admin --email "admin@dsc.gg/servertipacvn" --name "Admin" --password "Admin123"
-    
-    # Create flag file to indicate first start is complete
-    touch "$FIRST_START_FLAG"
-fi
-
-# Start PufferPanel
+pufferpanel user add --admin --email "admin@dsc.gg/servertipacvn" --name "Admin" --password "Admin123"
 echo "Starting PufferPanel service..."
-systemctl start pufferpanel
-
-# Keep container running
-echo "Container is running. Press Ctrl+C to stop."
-tail -f /dev/null 
+systemctl restart pufferpanel 
 
 EOF 
 
