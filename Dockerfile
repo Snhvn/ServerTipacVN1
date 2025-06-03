@@ -5,9 +5,6 @@ FROM ubuntu:24.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Define admin user environment variables
-ENV ADMIN_EMAIL="admin@servertipacvn"
-ENV ADMIN_NAME="Admin"
-ENV ADMIN_PASSWORD="Admin123"
 
 # Install required packages and PufferPanel
 RUN apt-get update && \
@@ -38,13 +35,9 @@ if [ ! -f "$FIRST_START_FLAG" ]; then
     echo "First time startup detected - creating admin user..."
     
     # Check if all required environment variables are set
-    if [ -z "$ADMIN_EMAIL" ] || [ -z "$ADMIN_NAME" ] || [ -z "$ADMIN_PASSWORD" ]; then
-        echo "Error: Please set ADMIN_EMAIL, ADMIN_NAME, and ADMIN_PASSWORD environment variables"
-        exit 1
-    fi
 
     # Create admin user
-    pufferpanel user add --admin --email "$ADMIN_EMAIL" --name "$ADMIN_NAME" --password "$ADMIN_PASSWORD"
+    pufferpanel user add --admin --email "admin@dsc.gg/servertipacvn" --name "Admin" --password "Admin123"
     
     # Create flag file to indicate first start is complete
     touch "$FIRST_START_FLAG"
