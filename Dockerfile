@@ -1,37 +1,69 @@
-# Imagen base de Linux
-FROM debian:bullseye-slim
+# Use Ubuntu 24.04 LTS as base image
+FROM ubuntu:24.04
 
-# Establecer variables de entorno para evitar prompts interactivos
+# Avoid prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Instalar dependencias necesarias
-RUN apt-get update && apt-get install -y \
+# Define admin user environment variables
+ENV ADMIN_EMAIL="admin@servertipacvn"
+ENV ADMIN_NAME="Admin"
+ENV ADMIN_PASSWORD="Admin123"
+
+# Install required packages and PufferPanel
+RUN apt-get update && \
+    apt-get install -y \
     curl \
     wget \
+    systemctl \
+    sudo \
     gnupg \
-    apt-transport-https \
-    ca-certificates \
-    software-properties-common \
-    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Crear volúmenes para configuración y datos
-RUN mkdir -p /volumes/config /volumes/data
+# Install PufferPanel repository and package
+RUN curl -s https://packagecloud.io/install/repositories/pufferpanel/pufferpanel/script.deb.sh?any=true | bash && \
+    apt-get update && \
+    apt-get install -y pufferpanel
 
-# Descargar y configurar PufferPanel
-RUN apt update && apt install docker.io -y
-RUN docker volume create pufferpanel-config
-RUN docker volume create pufferpanel-data 
-RUN docker run -d --name pufferpanel -p 8080:8080 -p 5657:5657 -v pufferpanel-config:/etc/pufferpanel -v pufferpanel-data:/var/lib/pufferpanel --restart=on-failure pufferpanel/pufferpanel:latest && \
-    sleep 10
+# Create entrypoint script
+RUN cat <<EOF > /start.sh
+#!/bin/bash
 
-# Añadir credenciales de usuario preconfiguradas
-# (Reemplaza los valores USERNAME y PASSWORD con tus credenciales reales)
-RUN docker exec -it pufferpanel /pufferpanel/pufferpanel user add --name Admin \
-    --email admin@dsc.gg/servertipacvn --password Admin123
+# Start PufferPanel service
+echo "Starting PufferPanel service..."
+systemctl enable --now pufferpanel
 
-# Exponer los puertos necesarios para el acceso a PufferPanel
+# Check if this is first time startup
+FIRST_START_FLAG="/var/lib/pufferpanel/.first_start"
+if [ ! -f "$FIRST_START_FLAG" ]; then
+    echo "First time startup detected - creating admin user..."
+    
+    # Check if all required environment variables are set
+    if [ -z "$ADMIN_EMAIL" ] || [ -z "$ADMIN_NAME" ] || [ -z "$ADMIN_PASSWORD" ]; then
+        echo "Error: Please set ADMIN_EMAIL, ADMIN_NAME, and ADMIN_PASSWORD environment variables"
+        exit 1
+    fi
+
+    # Create admin user
+    pufferpanel user add --admin --email "$ADMIN_EMAIL" --name "$ADMIN_NAME" --password "$ADMIN_PASSWORD"
+    
+    # Create flag file to indicate first start is complete
+    touch "$FIRST_START_FLAG"
+fi
+
+# Start PufferPanel
+echo "Starting PufferPanel service..."
+systemctl start pufferpanel
+
+# Keep container running
+echo "Container is running. Press Ctrl+C to stop."
+tail -f /dev/null 
+
+EOF 
+
+RUN chmod +x /start.sh
+
+# Expose PufferPanel web interface port
 EXPOSE 8080 5657
 
-# Configurar punto de entrada
-CMD ["docker", "start", "pufferpanel", "-ai"]
+# Set entrypoint
+CMD ["/start.sh"]
