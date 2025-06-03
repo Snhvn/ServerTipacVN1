@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y \
 RUN mkdir -p /volumes/config /volumes/data
 
 # Descargar y configurar PufferPanel
-RUN apt install docker.io -y
+RUN apt update && apt install docker.io -y
 RUN docker volume create pufferpanel-config
 RUN docker volume create pufferpanel-data 
 RUN docker run -d --name pufferpanel -p 8080:8080 -p 5657:5657 -v pufferpanel-config:/etc/pufferpanel -v pufferpanel-data:/var/lib/pufferpanel --restart=on-failure pufferpanel/pufferpanel:latest && \
