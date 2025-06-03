@@ -7,6 +7,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Instalar dependencias necesarias
 RUN apt-get update && apt-get install -y \
     curl \
+    wget \
     gnupg \
     apt-transport-https \
     ca-certificates \
@@ -18,10 +19,10 @@ RUN apt-get update && apt-get install -y \
 RUN mkdir -p /volumes/config /volumes/data
 
 # Descargar y configurar PufferPanel
-RUN curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh && rm get-docker.sh && \
-    docker volume create pufferpanel-config && \
-    docker volume create pufferpanel-data && \
-    docker run -d --name pufferpanel -p 8080:8080 -p 5657:5657 -v pufferpanel-config:/etc/pufferpanel -v pufferpanel-data:/var/lib/pufferpanel --restart=on-failure pufferpanel/pufferpanel:latest && \
+RUN wget -O get-docker.sh https://get.docker.com && sh get-docker.sh && rm get-docker.sh   
+RUN docker volume create pufferpanel-config
+RUN docker volume create pufferpanel-data 
+RUN docker run -d --name pufferpanel -p 8080:8080 -p 5657:5657 -v pufferpanel-config:/etc/pufferpanel -v pufferpanel-data:/var/lib/pufferpanel --restart=on-failure pufferpanel/pufferpanel:latest && \
     sleep 10
 
 # Añadir credenciales de usuario preconfiguradas
