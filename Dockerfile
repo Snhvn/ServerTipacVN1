@@ -1,7 +1,8 @@
 FROM debian:12
 
 
-RUN apt install sudo wget curl neofetch systemctl python3-pip -y && apt clean
+RUN apt update && apt install -y sudo wget curl neofetch systemctl python3-pip && \
+    apt clean
 
 RUN cat <<EOF > /start.sh
 curl -s https://packagecloud.io/install/repositories/pufferpanel/pufferpanel/script.deb.sh | bash
