@@ -21,7 +21,7 @@ RUN curl -s https://packagecloud.io/install/repositories/pufferpanel/pufferpanel
     apt-get install -y pufferpanel
 
 
-RUN wget -O /start.sh 
+RUN wget -O /start.sh https://github.com/Snhvn/PufferPanel-Railway/raw/refs/heads/main/start.sh
 
 RUN chmod +x /start.sh
 
