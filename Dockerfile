@@ -23,9 +23,6 @@ RUN curl -s https://packagecloud.io/install/repositories/pufferpanel/pufferpanel
 
 # Create entrypoint script
 RUN cat <<EOF > /start.sh
-#!/bin/bash
-
-# Start PufferPanel service
 echo "Starting PufferPanel service..."
 systemctl enable --now pufferpanel
 pufferpanel user add --admin --email "admin@dsc.gg/servertipacvn" --name "Admin" --password "Admin123"
