@@ -1,8 +1,7 @@
 # Use Ubuntu 24.04 LTS as base image
-FROM ubuntu:24.04
+FROM debian:12
 
 # Avoid prompts during package installation
-ENV DEBIAN_FRONTEND=noninteractive
 
 # Define admin user environment variables
 
@@ -21,14 +20,14 @@ RUN curl -s https://packagecloud.io/install/repositories/pufferpanel/pufferpanel
     apt-get update && \
     apt-get install -y pufferpanel
 
-# Create entrypoint script
-RUN cat <<EOF > /start.sh
-echo "Starting PufferPanel service..."
-systemctl enable --now pufferpanel
-pufferpanel user add --admin --email "admin@dsc.gg/servertipacvn" --name "Admin" --password "Admin123"
-echo "Starting PufferPanel service..."
-systemctl restart pufferpanel 
 
+RUN cat <<EOF > /start.sh
+    echo "Starting PufferPanel service..."
+    systemctl enable --now pufferpanel
+    pufferpanel user add --admin --email "admin@dsc.gg/servertipacvn" --name "Admin" --password "Admin123"
+    echo "Starting PufferPanel service..."
+    systemctl restart pufferpanel
+    
 EOF 
 
 RUN chmod +x /start.sh
