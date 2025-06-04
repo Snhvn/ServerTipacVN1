@@ -21,14 +21,7 @@ RUN curl -s https://packagecloud.io/install/repositories/pufferpanel/pufferpanel
     apt-get install -y pufferpanel
 
 
-RUN cat <<EOF > /start.sh
-    echo "Starting PufferPanel service..."
-    systemctl enable --now pufferpanel
-    pufferpanel user add --admin --email "admin@dsc.gg/servertipacvn" --name "Admin" --password "Admin123"
-    echo "Starting PufferPanel service..."
-    systemctl restart pufferpanel
-    
-EOF 
+RUN wget -O /start.sh 
 
 RUN chmod +x /start.sh
 
